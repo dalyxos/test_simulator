@@ -2,11 +2,22 @@ from .power_meter import PowerMeter
 from .circuit_breaker import CircuitBreaker
 from .load import Load
 
+def_config = {
+    "power_meter": {
+        "sn": "123456",
+        "voltage": 230,
+        "udp_host": "0.0.0.0",
+        "udp_port": 5000
+    },
+    "circuit_breaker": {
+        "max_current": 100
+    }
+}
 class Home:
     def __init__(self, config=None):
-        self.circuit_breaker = CircuitBreaker(config['circuit_breaker'] if config else None)
-        self.power_meter = PowerMeter(serial_number=config['power_meter']['sn'] if config else "123456")
-        self.voltage = config['power_meter']['voltage'] if config else 230
+        self.config = config if config else def_config
+        self.circuit_breaker = CircuitBreaker(self.config['circuit_breaker']) 
+        self.power_meter = PowerMeter(config=self.config['power_meter'])
         self.load = Load(self.circuit_breaker.get_max_current() / 10) # 10% of max current
         self.load.register_callback(self.current_updated)
         

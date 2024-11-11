@@ -11,22 +11,22 @@ class PowerMeter:
         self.current = current
         self.udp_host = config['udp_host']
         self.udp_port = config['udp_port']
-        self.start_streaming(self, self.udp_host, self.udp_port)
+        self.start_streaming()
 
     def read_meter(self):
-        return self.current
+        return {'current': self.current, 'power': self.current * default_voltage, 'voltage': default_voltage}
 
     def update_current(self, new_reading):
         self.current = new_reading
 
-    def start_streaming(self, ip='255.255.255.255', port=5000):
-        thread = threading.Thread(target=self.stream_data, args=(self, ip, port))
+    def start_streaming(self):
+        thread = threading.Thread(target=self.stream_data)
         thread.daemon = True
         thread.start()
         
-    def stream_data(self, power_meter, ip, port):
+    def stream_data(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         while True:
-            data = f"Serial: {power_meter.serial_number}, Current: {power_meter.read_meter()}"
-            sock.sendto(data.encode(), (ip, port))
+            data = f"Serial: {self.serial_number}, Current: {self.read_meter()}"
+            sock.sendto(data.encode(), (self.udp_host, self.udp_port))
             time.sleep(1)
