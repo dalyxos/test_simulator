@@ -1,0 +1,13 @@
+docker run -it --rm -v ${PWD}:/workspace -p 3000:3000 -w /workspace node:lts-bullseye /bin/bash
+
+yarn create react-app my-app
+npx create-react-app react-flask-app
+
+npm install npm@latest -g
+
+npm cache clean --force
+
+yarn install
+yarn start
+
+flask run
